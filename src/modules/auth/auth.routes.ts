@@ -1,5 +1,6 @@
 import { Request, Router } from 'express';
 import { protect } from '../../middleware/auth.middleware';
+import { authorize } from '../../middleware/rbac.middleware';
 import { login, logout, refreshAccessToken, register } from './auth.controller';
 
 const authRouter = Router();
@@ -15,5 +16,35 @@ authRouter.get('/protected', protect, (req: AuthenticatedRequestInterface, res) 
 });
 authRouter.post('/logout', protect, logout);
 authRouter.post('/refresh', refreshAccessToken);
+
+// Protected route for reading
+authRouter.get(
+    '/read-protected',
+    protect,
+    authorize('read'),
+    (req: AuthenticatedRequestInterface, res) => {
+        res.status(200).json({ message: 'You have read access', user: req.user });
+    },
+);
+
+// Protected route for writing
+authRouter.post(
+    '/write-protected',
+    protect,
+    authorize('write'),
+    (req: AuthenticatedRequestInterface, res) => {
+        res.status(200).json({ message: 'You have write access', user: req.user });
+    },
+);
+
+// Protected route for deleting
+authRouter.delete(
+    '/delete-protected',
+    protect,
+    authorize('delete'),
+    (req: AuthenticatedRequestInterface, res) => {
+        res.status(200).json({ message: 'You have delete access', user: req.user });
+    },
+);
 
 export { authRouter };

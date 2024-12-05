@@ -12,7 +12,7 @@ export const protect = async (
     res: Response,
     next: NextFunction,
 ): Promise<void> => {
-    const token = req.headers.authorization?.split(' ')[1]; // Bearer <token>
+    const token = req.headers.authorization?.split(' ')[1];
 
     if (!token) {
         res.status(401).json({ message: 'No token provided' });
@@ -20,18 +20,16 @@ export const protect = async (
     }
 
     try {
-        // Decode the JWT
         // TODO Add type
         const decoded = jwt.verify(token, env.jwtSecret) as any;
 
-        // Check Redis for active session
         const redisToken = await redis.get(`session:${decoded.userId}`);
         if (redisToken !== token) {
             res.status(401).json({ message: 'Session expired or invalid' });
             return;
         }
 
-        req.user = decoded; // Attach decoded token data to the request
+        req.user = decoded;
         next();
     } catch (error) {
         res.status(401).json({ message: 'Invalid or expired token' });

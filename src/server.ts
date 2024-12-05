@@ -5,13 +5,8 @@ import { redis } from './config/redis';
 
 const startServer = async () => {
     try {
-        // Connect to MongoDB
         await connectToMongo();
-
-        // Connect to Redis
         await redis.ping();
-
-        // Start Express server
         app.listen(env.port, () => {
             console.log(`Server running on http://localhost:${env.port}`);
         });

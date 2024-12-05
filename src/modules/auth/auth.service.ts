@@ -20,7 +20,7 @@ export class AuthService {
             throw new Error('User already exists');
         }
 
-        if (!RbacService.roleExists(role)) {
+        if (!(await RbacService.roleExists(role))) {
             throw new Error('Invalid role');
         }
 
@@ -86,7 +86,7 @@ export class AuthService {
         const db = await connectToMongo();
         const users = db.collection<User>(this.collectionName);
 
-        if (!RbacService.roleExists(role)) {
+        if (!(await RbacService.roleExists(role))) {
             throw new Error('Invalid role');
         }
 

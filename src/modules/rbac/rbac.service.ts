@@ -1,37 +1,48 @@
-import { roles } from './rbac.model';
+import { getRoleCollection } from './role.model';
 
 export class RbacService {
-    static roleExists(roleName: string): boolean {
-        return roles.some((role) => role.name === roleName);
+    static async roleExists(roleName: string): Promise<boolean> {
+        const rolesCollection = await getRoleCollection();
+        const role = await rolesCollection.findOne({ name: roleName });
+        return !!role;
     }
 
-    static getPermissions(roleName: string): string[] {
-        const role = roles.find((role) => role.name === roleName);
-        return role ? role.permissions : [];
+    static async getPermissions(roleName: string): Promise<string[]> {
+        const rolesCollection = await getRoleCollection();
+        const role = await rolesCollection.findOne({ name: roleName });
+        if (!role) {
+            throw new Error(`Role "${roleName}" not found`);
+        }
+        return role.permissions;
     }
 
-    static hasPermission(roleName: string, permission: string): boolean {
-        const permissions = this.getPermissions(roleName);
+    static async hasPermission(roleName: string, permission: string): Promise<boolean> {
+        const permissions = await this.getPermissions(roleName);
         return permissions.includes(permission);
     }
 
-    static addPermission(roleName: string, permission: string): void {
-        const role = roles.find((r) => r.name === roleName);
+    static async addPermission(roleName: string, permission: string): Promise<void> {
+        const rolesCollection = await getRoleCollection();
+
+        const role = await rolesCollection.findOne({ name: roleName });
         if (!role) {
-            throw new Error('Role not found');
+            throw new Error(`Role "${roleName}" not found`);
         }
 
         if (!role.permissions.includes(permission)) {
-            role.permissions.push(permission);
+            await rolesCollection.updateOne(
+                { name: roleName },
+                { $push: { permissions: permission }, $set: { updatedAt: new Date() } },
+            );
         }
     }
 
-    static removePermission(roleName: string, permission: string): void {
-        const role = roles.find((r) => r.name === roleName);
-        if (!role) {
-            throw new Error('Role not found');
-        }
+    static async removePermission(roleName: string, permission: string): Promise<void> {
+        const rolesCollection = await getRoleCollection();
 
-        role.permissions = role.permissions.filter((p) => p !== permission);
+        await rolesCollection.updateOne(
+            { name: roleName },
+            { $pull: { permissions: permission }, $set: { updatedAt: new Date() } },
+        );
     }
 }

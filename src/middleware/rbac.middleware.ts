@@ -7,7 +7,11 @@ interface AuthenticatedRequestInterface extends Request {
 }
 
 export const authorize = (requiredPermission: string) => {
-    return (req: AuthenticatedRequestInterface, res: Response, next: NextFunction): void => {
+    return async (
+        req: AuthenticatedRequestInterface,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> => {
         try {
             const userRole = req.user?.role;
 
@@ -16,7 +20,8 @@ export const authorize = (requiredPermission: string) => {
                 return;
             }
 
-            if (!RbacService.hasPermission(userRole, requiredPermission)) {
+            const hasPermission = await RbacService.hasPermission(userRole, requiredPermission);
+            if (!hasPermission) {
                 res.status(403).json({ message: 'Access denied' });
                 return;
             }

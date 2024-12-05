@@ -117,7 +117,7 @@ export const addPermission = async (req: Request, res: Response): Promise<void> 
             return;
         }
 
-        RbacService.addPermission(role, permission);
+        await RbacService.addPermission(role, permission);
 
         res.status(200).json({ message: 'Permission added successfully' });
     } catch (error: any) {
@@ -134,7 +134,7 @@ export const removePermission = async (req: Request, res: Response): Promise<voi
             return;
         }
 
-        RbacService.removePermission(role, permission);
+        await RbacService.removePermission(role, permission);
 
         res.status(200).json({ message: 'Permission removed successfully' });
     } catch (error: any) {

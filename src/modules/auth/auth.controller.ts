@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../../config/env';
 import { redis } from '../../config/redis';
+import { RbacService } from '../rbac/rbac.service';
 import { AuthService } from './auth.service';
 import { registerSchema } from './auth.validation';
 
@@ -87,5 +88,56 @@ export const refreshAccessToken = async (req: Request, res: Response): Promise<v
         res.status(200).json({ accessToken });
     } catch (error) {
         res.status(401).json({ message: 'Invalid or expired refresh token' });
+    }
+};
+
+export const assignRole = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { userId, role } = req.body;
+
+        if (!userId || !role) {
+            res.status(400).json({ message: 'User ID and role are required' });
+            return;
+        }
+
+        await authService.assignRole(userId, role);
+
+        res.status(200).json({ message: 'Role assigned successfully' });
+    } catch (error: any) {
+        res.status(400).json({ message: error.message || 'Failed to assign role' });
+    }
+};
+
+export const addPermission = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { role, permission } = req.body;
+
+        if (!role || !permission) {
+            res.status(400).json({ message: 'Role and permission are required' });
+            return;
+        }
+
+        RbacService.addPermission(role, permission);
+
+        res.status(200).json({ message: 'Permission added successfully' });
+    } catch (error: any) {
+        res.status(400).json({ message: error.message || 'Failed to add permission' });
+    }
+};
+
+export const removePermission = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { role, permission } = req.body;
+
+        if (!role || !permission) {
+            res.status(400).json({ message: 'Role and permission are required' });
+            return;
+        }
+
+        RbacService.removePermission(role, permission);
+
+        res.status(200).json({ message: 'Permission removed successfully' });
+    } catch (error: any) {
+        res.status(400).json({ message: error.message || 'Failed to remove permission' });
     }
 };

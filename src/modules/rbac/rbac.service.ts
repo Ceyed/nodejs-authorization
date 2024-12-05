@@ -14,4 +14,24 @@ export class RbacService {
         const permissions = this.getPermissions(roleName);
         return permissions.includes(permission);
     }
+
+    static addPermission(roleName: string, permission: string): void {
+        const role = roles.find((r) => r.name === roleName);
+        if (!role) {
+            throw new Error('Role not found');
+        }
+
+        if (!role.permissions.includes(permission)) {
+            role.permissions.push(permission);
+        }
+    }
+
+    static removePermission(roleName: string, permission: string): void {
+        const role = roles.find((r) => r.name === roleName);
+        if (!role) {
+            throw new Error('Role not found');
+        }
+
+        role.permissions = role.permissions.filter((p) => p !== permission);
+    }
 }

@@ -75,12 +75,28 @@ export class AuthService {
     async findOne(userId: string) {
         const db = await connectToMongo();
         const users = db.collection<User>(this.collectionName);
-
-        // Find user by email
-        const user = await users.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+        const user = await users.findOne({ id: new mongoose.Types.ObjectId(userId) });
         if (!user) {
             return undefined;
         }
         return user;
+    }
+
+    async assignRole(userId: string, role: string): Promise<void> {
+        const db = await connectToMongo();
+        const users = db.collection<User>(this.collectionName);
+
+        if (!RbacService.roleExists(role)) {
+            throw new Error('Invalid role');
+        }
+
+        const result = await users.updateOne(
+            { _id: new mongoose.Types.ObjectId(userId) },
+            { $set: { role } },
+        );
+
+        if (result.matchedCount === 0) {
+            throw new Error('User not found');
+        }
     }
 }

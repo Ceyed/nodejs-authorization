@@ -1,7 +1,15 @@
 import { Request, Router } from 'express';
 import { protect } from '../../middleware/auth.middleware';
 import { authorize } from '../../middleware/rbac.middleware';
-import { login, logout, refreshAccessToken, register } from './auth.controller';
+import {
+    addPermission,
+    assignRole,
+    login,
+    logout,
+    refreshAccessToken,
+    register,
+    removePermission,
+} from './auth.controller';
 
 const authRouter = Router();
 
@@ -17,7 +25,11 @@ authRouter.get('/protected', protect, (req: AuthenticatedRequestInterface, res) 
 authRouter.post('/logout', protect, logout);
 authRouter.post('/refresh', refreshAccessToken);
 
-// Protected route for reading
+authRouter.post('/assign-role', protect, authorize('write'), assignRole);
+authRouter.post('/add-permission', protect, authorize('write'), addPermission);
+authRouter.post('/remove-permission', protect, authorize('write'), removePermission);
+
+// ? TEST ROUTES
 authRouter.get(
     '/read-protected',
     protect,
@@ -26,8 +38,6 @@ authRouter.get(
         res.status(200).json({ message: 'You have read access', user: req.user });
     },
 );
-
-// Protected route for writing
 authRouter.post(
     '/write-protected',
     protect,
@@ -36,8 +46,6 @@ authRouter.post(
         res.status(200).json({ message: 'You have write access', user: req.user });
     },
 );
-
-// Protected route for deleting
 authRouter.delete(
     '/delete-protected',
     protect,

@@ -16,8 +16,12 @@ export class RoleController {
 
             res.status(201).json({ message: 'Role created successfully.', role });
         } catch (error) {
-            console.error('Error creating role:', error);
-            res.status(500).json({ message: 'Internal server error.' });
+            if (error instanceof Error) {
+                res.status(409).json({ message: 'Role already exists.' });
+            } else {
+                console.error('Error creating role:', error);
+                res.status(500).json({ message: 'Internal server error.' });
+            }
         }
     }
 }

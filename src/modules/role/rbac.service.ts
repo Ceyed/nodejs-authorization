@@ -9,7 +9,7 @@ export class RoleService {
 
         const existingRole: RoleInterface | null = await roleCollection.findOne({ name });
         if (existingRole) {
-            throw new Error('Role already exists.');
+            throw new Error('Role already exists');
         }
 
         const validGroups: PermissionGroup[] = await PermissionGroupService.getGroupsByNames(

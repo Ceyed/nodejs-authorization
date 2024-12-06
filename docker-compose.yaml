@@ -8,10 +8,9 @@ services:
             - '27017:27017'
         volumes:
             - mongo-data:/data/db
-        # environment:
-        #     - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-        #     - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
         restart: always
+        networks:
+            - app-network
 
     redis:
         image: redis:latest
@@ -19,7 +18,28 @@ services:
         ports:
             - '6379:6379'
         restart: always
+        networks:
+            - app-network
+
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: app
+        ports:
+            - '${PORT}:${PORT}'
+        env_file:
+            - .env
+        depends_on:
+            - mongodb
+            - redis
+        networks:
+            - app-network
 
 volumes:
     mongo-data:
         driver: local
+
+networks:
+    app-network:
+        driver: bridge

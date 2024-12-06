@@ -6,29 +6,32 @@ interface AuthenticatedRequestInterface extends Request {
     user?: UserWithRole;
 }
 
-export const authorize = (requiredPermission: string) => {
+export const authorize = (module: string, action: string) => {
     return async (
         req: AuthenticatedRequestInterface,
         res: Response,
         next: NextFunction,
     ): Promise<void> => {
         try {
-            const userRole = req.user?.role;
-
-            if (!userRole) {
-                res.status(403).json({ message: 'Role not assigned' });
+            const user = req.user;
+            if (!user || !user.role) {
+                res.status(401).json({ message: 'Unauthorized' });
                 return;
             }
 
-            const hasPermission = await RbacService.hasPermission(userRole, requiredPermission);
-            if (!hasPermission) {
-                res.status(403).json({ message: 'Access denied' });
+            const permissions = await RbacService.getPermissions(user.role);
+
+            const requiredPermission = `${module}:${action}`;
+            if (!permissions.includes(requiredPermission)) {
+                res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
                 return;
             }
 
             next();
         } catch (error) {
-            res.status(500).json({ message: 'Server error' });
+            console.error('Authorization error:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
+            return;
         }
     };
 };

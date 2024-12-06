@@ -5,6 +5,7 @@ export interface Role {
     _id?: mongoose.Types.ObjectId;
     name: string;
     permissions: string[];
+    groups: string[];
     createdAt?: Date;
     updatedAt?: Date;
 }

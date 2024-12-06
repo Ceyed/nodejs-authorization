@@ -1,3 +1,5 @@
+import { ModulesEnum } from '../../enums/modules.enum';
+import { PermissionsEnum } from '../../enums/permissions.enum';
 import { getPermissionGroupCollection, PermissionGroup } from './group.model';
 
 export class PermissionGroupService {
@@ -46,5 +48,20 @@ export class PermissionGroupService {
     static async listGroups(): Promise<PermissionGroup[]> {
         const groupCollection = await getPermissionGroupCollection();
         return groupCollection.find().toArray();
+    }
+
+    static async initializeDefaultGroups(): Promise<void> {
+        await PermissionGroupService.createGroup('Blog Manager', [
+            `${ModulesEnum.BLOG}:${PermissionsEnum.ALL}`,
+        ]);
+        await PermissionGroupService.createGroup('Product Manager', [
+            `${ModulesEnum.PRODUCT}:${PermissionsEnum.READ}`,
+        ]);
+        await PermissionGroupService.createGroup('Role Manager', [
+            `${ModulesEnum.ROLE}:${PermissionsEnum.ALL}`,
+        ]);
+        await PermissionGroupService.createGroup('User Group Manager', [
+            `${ModulesEnum.USER_GROUP}:${PermissionsEnum.ALL}`,
+        ]);
     }
 }

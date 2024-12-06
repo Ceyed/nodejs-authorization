@@ -1,4 +1,6 @@
 import { Request, Router } from 'express';
+import { ModulesEnum } from '../../enums/modules.enum';
+import { PermissionsEnum } from '../../enums/permissions.enum';
 import { protect } from '../../middleware/auth.middleware';
 import { authorize } from '../../middleware/rbac.middleware';
 import {
@@ -29,19 +31,44 @@ authRouter.post('/logout', protect, logout);
 authRouter.post('/refresh', refreshAccessToken);
 
 // ? Authorization
-authRouter.post('/assign-role', protect, authorize('role', 'write'), assignRole);
-authRouter.post('/add-permission', protect, authorize('role', 'write'), addPermission);
-authRouter.post('/remove-permission', protect, authorize('role', 'write'), removePermission);
+authRouter.post(
+    '/assign-role',
+    protect,
+    authorize(ModulesEnum.ROLE, PermissionsEnum.CREATE),
+    assignRole,
+);
+authRouter.post(
+    '/add-permission',
+    protect,
+    authorize(ModulesEnum.ROLE, PermissionsEnum.CREATE),
+    addPermission,
+);
+authRouter.post(
+    '/remove-permission',
+    protect,
+    authorize(ModulesEnum.ROLE, PermissionsEnum.CREATE),
+    removePermission,
+);
 
 // ? Groups
-authRouter.post('/permission-groups', protect, authorize('role', 'write'), createPermissionGroup);
-authRouter.get('/permission-groups', protect, authorize('role', 'read'), listPermissionGroups);
+authRouter.post(
+    '/permission-groups',
+    protect,
+    authorize(ModulesEnum.ROLE, PermissionsEnum.CREATE),
+    createPermissionGroup,
+);
+authRouter.get(
+    '/permission-groups',
+    protect,
+    authorize(ModulesEnum.ROLE, PermissionsEnum.READ),
+    listPermissionGroups,
+);
 
 // ? TEST ROUTES
 authRouter.get(
     '/read-protected',
     protect,
-    authorize('blog', 'read'),
+    authorize(ModulesEnum.BLOG, PermissionsEnum.READ),
     (req: AuthenticatedRequestInterface, res) => {
         res.status(200).json({ message: 'You have read access', user: req.user });
     },
@@ -49,7 +76,7 @@ authRouter.get(
 authRouter.post(
     '/write-protected',
     protect,
-    authorize('blog', 'write'),
+    authorize(ModulesEnum.BLOG, PermissionsEnum.CREATE),
     (req: AuthenticatedRequestInterface, res) => {
         res.status(200).json({ message: 'You have write access', user: req.user });
     },
@@ -57,7 +84,7 @@ authRouter.post(
 authRouter.delete(
     '/delete-protected',
     protect,
-    authorize('blog', 'delete'),
+    authorize(ModulesEnum.BLOG, PermissionsEnum.DELETE),
     (req: AuthenticatedRequestInterface, res) => {
         res.status(200).json({ message: 'You have delete access', user: req.user });
     },

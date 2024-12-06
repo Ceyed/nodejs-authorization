@@ -1,3 +1,5 @@
+import { ModulesEnum } from '../../enums/modules.enum';
+import { PermissionsEnum } from '../../enums/permissions.enum';
 import { PermissionGroupService } from './group.service';
 import { getRoleCollection } from './role.model';
 
@@ -25,7 +27,7 @@ export class RbacService {
 
         allPermissions = allPermissions.reduce((acc, permission) => {
             const [module, action] = permission.split(':');
-            if (action === 'all') {
+            if (action === PermissionsEnum.ALL) {
                 // TODO: No hardcode
                 const modulePermissions = [`${module}:read`, `${module}:write`, `${module}:delete`];
                 return [...acc, ...modulePermissions];
@@ -36,9 +38,14 @@ export class RbacService {
         return [...new Set(allPermissions)];
     }
 
-    static async hasPermission(roleName: string, permission: string): Promise<boolean> {
+    static async hasPermission(
+        roleName: string,
+        module: ModulesEnum,
+        action: PermissionsEnum,
+    ): Promise<boolean> {
+        const requiredPermission = `${module}:${action}`;
         const permissions = await this.getPermissions(roleName);
-        return permissions.includes(permission);
+        return permissions.includes(requiredPermission);
     }
 
     static async addPermission(roleName: string, permission: string): Promise<void> {

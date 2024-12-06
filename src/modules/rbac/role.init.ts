@@ -11,15 +11,13 @@ export const initializeRoles = async () => {
     const defaultRoles = [
         {
             name: 'admin',
-            // permissions: ['blog:all', 'product:read'],
             permissions: [],
-            groups: ['Blog Manager', 'Product Manager', 'Role Management'],
+            groups: ['Blog Manager', 'Product Manager', 'Role Manager', 'User Group Manager'],
             createdAt: new Date(),
             updatedAt: new Date(),
         },
         {
             name: 'editor',
-            // permissions: ['blog:read', 'blog:write'],
             permissions: [],
             groups: ['Blog Manager'],
             createdAt: new Date(),
@@ -27,7 +25,6 @@ export const initializeRoles = async () => {
         },
         {
             name: 'viewer',
-            // permissions: ['product:read'],
             permissions: [],
             groups: ['Product Manager'],
             createdAt: new Date(),

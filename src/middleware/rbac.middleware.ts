@@ -1,4 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
+import { ModulesEnum } from '../enums/modules.enum';
+import { PermissionsEnum } from '../enums/permissions.enum';
 import { UserWithRole } from '../modules/rbac/rbac.model';
 import { RbacService } from '../modules/rbac/rbac.service';
 
@@ -6,7 +8,7 @@ interface AuthenticatedRequestInterface extends Request {
     user?: UserWithRole;
 }
 
-export const authorize = (module: string, action: string) => {
+export const authorize = (module: ModulesEnum, action: PermissionsEnum) => {
     return async (
         req: AuthenticatedRequestInterface,
         res: Response,

@@ -1,7 +1,7 @@
-import { ModulesEnum } from '../../enums/modules.enum';
-import { PermissionsEnum } from '../../enums/permissions.enum';
+import { ModulesEnum } from '../../common/enums/modules.enum';
+import { PermissionsEnum } from '../../common/enums/permissions.enum';
+import { getRoleCollection } from '../../common/models/role.model';
 import { PermissionGroupService } from './group.service';
-import { getRoleCollection } from './role.model';
 
 export class RbacService {
     static async roleExists(roleName: string): Promise<boolean> {

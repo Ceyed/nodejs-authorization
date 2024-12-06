@@ -1,11 +1,11 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
-import { connectToMongo } from '../../config/db';
-import { env } from '../../config/env';
-import { redis } from '../../config/redis';
+import { User } from '../../common/models/auth.model';
+import { connectToMongo } from '../app/config/db';
+import { env } from '../app/config/env';
+import { redis } from '../app/config/redis';
 import { RbacService } from '../rbac/rbac.service';
-import { User } from './auth.model';
 
 export class AuthService {
     // TODO: No hardcode

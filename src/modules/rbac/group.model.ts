@@ -1,4 +1,4 @@
-import { connectToMongo } from '../../config/db';
+import { connectToMongo } from '../app/config/db';
 
 export interface PermissionGroup {
     _id?: string;

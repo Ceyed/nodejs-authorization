@@ -1,8 +1,8 @@
 import { Request, Router } from 'express';
-import { ModulesEnum } from '../../enums/modules.enum';
-import { PermissionsEnum } from '../../enums/permissions.enum';
-import { protect } from '../../middleware/auth.middleware';
-import { authorize } from '../../middleware/rbac.middleware';
+import { ModulesEnum } from '../../common/enums/modules.enum';
+import { PermissionsEnum } from '../../common/enums/permissions.enum';
+import { protect } from '../../common/middleware/auth.middleware';
+import { authorize } from '../../common/middleware/rbac.middleware';
 import {
     addPermission,
     assignRole,

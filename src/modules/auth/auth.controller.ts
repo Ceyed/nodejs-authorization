@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { env } from '../../config/env';
-import { redis } from '../../config/redis';
+import { env } from '../app/config/env';
+import { redis } from '../app/config/redis';
 import { PermissionGroupService } from '../rbac/group.service';
 import { RbacService } from '../rbac/rbac.service';
 import { AuthService } from './auth.service';

@@ -1,4 +1,4 @@
-import { getRoleCollection } from './role.model';
+import { getRoleCollection } from '../../common/models/role.model';
 
 export const initializeRoles = async () => {
     const rolesCollection = await getRoleCollection();

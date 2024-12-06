@@ -1,5 +1,5 @@
-import { ModulesEnum } from '../../enums/modules.enum';
-import { PermissionsEnum } from '../../enums/permissions.enum';
+import { ModulesEnum } from '../../common/enums/modules.enum';
+import { PermissionsEnum } from '../../common/enums/permissions.enum';
 import { getPermissionGroupCollection, PermissionGroup } from './group.model';
 
 export class PermissionGroupService {

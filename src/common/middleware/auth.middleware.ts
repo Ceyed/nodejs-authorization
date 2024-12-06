@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { env } from '../config/env';
-import { redis } from '../config/redis';
+import { env } from '../../modules/app/config/env';
+import { redis } from '../../modules/app/config/redis';
 
 interface AuthenticatedRequestInterface extends Request {
     user?: { id: string };

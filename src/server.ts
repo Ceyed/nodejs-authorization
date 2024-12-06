@@ -1,7 +1,7 @@
-import { app } from './app';
-import { connectToMongo } from './config/db';
-import { env } from './config/env';
-import { redis } from './config/redis';
+import { app } from './modules/app/app';
+import { connectToMongo } from './modules/app/config/db';
+import { env } from './modules/app/config/env';
+import { redis } from './modules/app/config/redis';
 
 const startServer = async () => {
     try {

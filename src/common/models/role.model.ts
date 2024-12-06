@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { connectToMongo } from '../../config/db';
+import { connectToMongo } from '../../modules/app/config/db';
 
 export interface Role {
     _id?: mongoose.Types.ObjectId;

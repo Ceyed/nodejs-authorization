@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
-import { authRouter } from './modules/auth/auth.routes';
-import { initializeRoles } from './modules/rbac/role.init';
+import { authRouter } from '../auth/auth.routes';
+import { initializeRoles } from '../rbac/role.init';
 
 export const app = express();
 

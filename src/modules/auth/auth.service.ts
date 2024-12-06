@@ -12,6 +12,7 @@ import { RolesEnum } from '../../common/enums/roles.enum';
 import { AccessAndRefreshTokenInterface } from '../../common/interfaces/access-and-refresh-tokens.interface';
 import { JwtAccessTokenInterface } from '../../common/interfaces/jwt-access-token.interface';
 import { JwtRefreshTokenInterface } from '../../common/interfaces/jwt-refresh-token.interface';
+import { RoleInterface } from '../../common/interfaces/role.interface';
 import { UserInterface } from '../../common/interfaces/user.interface';
 import { connectToMongo } from '../app/config/db';
 import { env } from '../app/config/env';
@@ -31,7 +32,7 @@ export class AuthService {
             throw new Error('User already exists');
         }
 
-        const roleExists: boolean = await RbacService.roleExists(role);
+        const roleExists: boolean = await RbacService.roleExistsByName(role);
         if (!roleExists) {
             throw new Error('Invalid role');
         }
@@ -95,20 +96,19 @@ export class AuthService {
         return user;
     }
 
-    async assignRole(userId: string, role: RolesEnum): Promise<void> {
+    async assignRole(userId: string, roleId: string): Promise<void> {
         const db = await connectToMongo();
         const users = db.collection<UserInterface>(this.collectionName);
 
-        const roleExists: boolean = await RbacService.roleExists(role);
-        if (!roleExists) {
+        const role: RoleInterface | null = await RbacService.findRole(roleId);
+        if (!role) {
             throw new Error('Invalid role');
         }
 
         const result: UpdateResult = await users.updateOne(
             { _id: new mongoose.Types.ObjectId(userId) },
-            { $set: { role } },
+            { $set: { role: role.name as RolesEnum } },
         );
-
         if (result.matchedCount === 0) {
             throw new Error('User not found');
         }

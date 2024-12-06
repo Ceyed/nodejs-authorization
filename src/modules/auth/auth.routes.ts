@@ -4,7 +4,7 @@ import { PermissionsEnum } from '../../common/enums/permissions.enum';
 import { protect } from '../../common/middleware/auth.middleware';
 import { authorize } from '../../common/middleware/rbac.middleware';
 import {
-    addPermission,
+    addGroupToRole,
     assignRole,
     createPermissionGroup,
     listPermissionGroups,
@@ -12,7 +12,7 @@ import {
     logout,
     refreshAccessToken,
     register,
-    removePermission,
+    removeGroupFromRole,
 } from './auth.controller';
 
 // TODO Refactor file
@@ -36,13 +36,13 @@ authRouter.post(
     '/add-permission',
     protect,
     authorize(ModulesEnum.ROLE, PermissionsEnum.CREATE),
-    addPermission,
+    addGroupToRole,
 );
 authRouter.post(
     '/remove-permission',
     protect,
     authorize(ModulesEnum.ROLE, PermissionsEnum.CREATE),
-    removePermission,
+    removeGroupFromRole,
 );
 
 // ? Groups

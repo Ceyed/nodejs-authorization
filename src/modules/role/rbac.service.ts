@@ -4,7 +4,11 @@ import { ModulePermissionType } from '../../common/types/module-permission.type'
 import { PermissionGroupService } from '../rbac/group.service';
 
 export class RoleService {
-    static async createRole(name: string, permissions: ModulePermissionType[], groups: string[]) {
+    static async createRole(
+        name: string,
+        permissions: ModulePermissionType[],
+        permissionGroupIds: string[],
+    ) {
         const roleCollection = await getRoleCollection();
 
         const existingRole: RoleInterface | null = await roleCollection.findOne({ name });
@@ -12,11 +16,11 @@ export class RoleService {
             throw new Error('Role already exists');
         }
 
-        const validGroups: PermissionGroup[] = await PermissionGroupService.getGroupsByNames(
-            groups,
+        const validGroups: PermissionGroup[] = await PermissionGroupService.getGroupsByIds(
+            permissionGroupIds,
         );
-        if (validGroups.length !== groups.length) {
-            throw new Error('One or more groups are invalid.');
+        if (validGroups.length !== permissionGroupIds.length) {
+            throw new Error('One or more permission group IDs are invalid.');
         }
 
         const role: RoleInterface = {
@@ -24,8 +28,9 @@ export class RoleService {
             updatedAt: new Date(),
             name,
             permissions,
-            groups,
+            groups: validGroups.map((group) => group.name),
         };
+
         await roleCollection.insertOne(role);
         return role;
     }

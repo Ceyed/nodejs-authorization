@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { PermissionsEnum } from '../../common/enums/permissions.enum';
 import {
     getPermissionGroupCollection,
@@ -55,5 +56,23 @@ export class PermissionGroupService {
     static async getGroupsByNames(names: string[]) {
         const groupCollection = await getPermissionGroupCollection();
         return groupCollection.find({ name: { $in: names } }).toArray();
+    }
+
+    static async getPermissionById(permissionGroupId: string): Promise<{ name: string } | null> {
+        const permissionGroupCollection = await getPermissionGroupCollection();
+        const permission: PermissionGroup | null = await permissionGroupCollection.findOne({
+            _id: new mongoose.Types.ObjectId(permissionGroupId) as any,
+        });
+        return permission ? { name: permission.name } : null;
+    }
+
+    static async getGroupsByIds(groupIds: string[]): Promise<PermissionGroup[]> {
+        const permissionGroupCollection = await getPermissionGroupCollection();
+
+        return permissionGroupCollection
+            .find({
+                _id: { $in: groupIds.map((id) => new mongoose.Types.ObjectId(id)) as any },
+            })
+            .toArray();
     }
 }

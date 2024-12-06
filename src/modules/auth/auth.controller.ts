@@ -119,13 +119,13 @@ export async function refreshAccessToken(req: Request, res: Response): Promise<v
 
 export async function assignRole(req: Request, res: Response): Promise<void> {
     try {
-        const { userId, role } = req.body;
-        if (!userId || !role) {
+        const { userId, roleId } = req.body;
+        if (!userId || !roleId) {
             res.status(400).json({ message: 'User ID and role are required' });
             return;
         }
 
-        await authService.assignRole(userId, role);
+        await authService.assignRole(userId, roleId);
         res.status(200).json({ message: 'Role assigned successfully' });
     } catch (error) {
         let errorMessage: string = 'Failed to assign role';
@@ -136,15 +136,15 @@ export async function assignRole(req: Request, res: Response): Promise<void> {
     }
 }
 
-export async function addPermission(req: Request, res: Response): Promise<void> {
+export async function addGroupToRole(req: Request, res: Response): Promise<void> {
     try {
-        const { role, permission } = req.body;
-        if (!role || !permission) {
-            res.status(400).json({ message: 'Role and permission are required' });
+        const { roleId, permissionGroupId } = req.body;
+        if (!roleId || !permissionGroupId) {
+            res.status(400).json({ message: 'Role ID and permission ID are required' });
             return;
         }
 
-        await RbacService.addPermission(role, permission);
+        await RbacService.addGroupToRole(roleId, permissionGroupId);
         res.status(200).json({ message: 'Permission added successfully' });
     } catch (error) {
         let errorMessage: string = 'Failed to add permission';
@@ -155,15 +155,15 @@ export async function addPermission(req: Request, res: Response): Promise<void> 
     }
 }
 
-export async function removePermission(req: Request, res: Response): Promise<void> {
+export async function removeGroupFromRole(req: Request, res: Response): Promise<void> {
     try {
-        const { role, permission } = req.body;
-        if (!role || !permission) {
+        const { roleId, permissionGroupId } = req.body;
+        if (!roleId || !permissionGroupId) {
             res.status(400).json({ message: 'Role and permission are required' });
             return;
         }
 
-        await RbacService.removePermission(role, permission);
+        await RbacService.removeGroupFromRole(roleId, permissionGroupId);
         res.status(200).json({ message: 'Permission removed successfully' });
     } catch (error) {
         let errorMessage: string = 'Failed to remove permission';

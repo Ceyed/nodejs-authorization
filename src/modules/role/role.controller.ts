@@ -2,8 +2,21 @@ import { Request, Response } from 'express';
 import { RoleInterface } from '../../common/interfaces/role.interface';
 import { RoleService } from './rbac.service';
 
+const roleService: RoleService = RoleService.getInstance();
+
 export class RoleController {
-    static async createRole(req: Request, res: Response): Promise<void> {
+    private static _instance: RoleController;
+
+    private constructor() {}
+
+    public static getInstance(): RoleController {
+        if (!RoleController._instance) {
+            RoleController._instance = new RoleController();
+        }
+        return RoleController._instance;
+    }
+
+    async createRole(req: Request, res: Response): Promise<void> {
         try {
             const { name, permissions, permissionGroupIds } = req.body;
 
@@ -12,7 +25,7 @@ export class RoleController {
                 return;
             }
 
-            const role: RoleInterface = await RoleService.createRole(
+            const role: RoleInterface = await roleService.createRole(
                 name,
                 permissions,
                 permissionGroupIds,
@@ -21,7 +34,7 @@ export class RoleController {
             res.status(201).json({ message: 'Role created successfully.', role });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(409).json({ message: 'Role already exists.' });
+                res.status(409).json({ message: error.message });
             } else {
                 console.error('Error creating role:', error);
                 res.status(500).json({ message: 'Internal server error.' });

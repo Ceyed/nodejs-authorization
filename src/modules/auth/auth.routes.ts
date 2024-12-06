@@ -3,46 +3,37 @@ import { ModulesEnum } from '../../common/enums/modules.enum';
 import { PermissionsEnum } from '../../common/enums/permissions.enum';
 import { protect } from '../../common/middleware/auth.middleware';
 import { authorize } from '../../common/middleware/rbac.middleware';
-import {
-    addGroupToRole,
-    assignRole,
-    createPermissionGroup,
-    listPermissionGroups,
-    login,
-    logout,
-    refreshAccessToken,
-    register,
-    removeGroupFromRole,
-} from './auth.controller';
+import { AuthController } from './auth.controller';
 
 // TODO Refactor file
 
-const authRouter = Router();
+const authRouter: Router = Router();
+const authController: AuthController = AuthController.getInstance();
 
 // ? Authentication
-authRouter.post('/register', register);
-authRouter.post('/login', login);
-authRouter.post('/refresh', refreshAccessToken);
-authRouter.post('/logout', protect, logout);
+authRouter.post('/register', authController.register.bind(authController));
+authRouter.post('/login', authController.login.bind(authController));
+authRouter.post('/refresh', authController.refreshAccessToken.bind(authController));
+authRouter.post('/logout', protect, authController.logout.bind(authController));
 
 // ? Authorization
 authRouter.post(
     '/assign-role',
     protect,
     authorize(ModulesEnum.ROLE, PermissionsEnum.CREATE),
-    assignRole,
+    authController.assignRole.bind(authController),
 );
 authRouter.post(
     '/add-permission',
     protect,
     authorize(ModulesEnum.ROLE, PermissionsEnum.CREATE),
-    addGroupToRole,
+    authController.addGroupToRole.bind(authController),
 );
 authRouter.post(
     '/remove-permission',
     protect,
     authorize(ModulesEnum.ROLE, PermissionsEnum.CREATE),
-    removeGroupFromRole,
+    authController.removeGroupFromRole.bind(authController),
 );
 
 // ? Groups
@@ -50,13 +41,13 @@ authRouter.post(
     '/permission-groups',
     protect,
     authorize(ModulesEnum.ROLE, PermissionsEnum.CREATE),
-    createPermissionGroup,
+    authController.createPermissionGroup.bind(authController),
 );
 authRouter.get(
     '/permission-groups',
     protect,
     authorize(ModulesEnum.ROLE, PermissionsEnum.READ),
-    listPermissionGroups,
+    authController.listPermissionGroups.bind(authController),
 );
 
 export { authRouter };

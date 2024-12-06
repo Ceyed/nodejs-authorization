@@ -13,13 +13,15 @@ export const authorize = (module: ModulesEnum, action: PermissionsEnum) => {
         next: NextFunction,
     ): Promise<void> => {
         try {
+            const rbacService: RbacService = RbacService.getInstance();
+
             const user: UserWithRoleInterface | undefined = req.user;
             if (!user || !user.role) {
                 res.status(401).json({ message: 'Unauthorized' });
                 return;
             }
 
-            const permissions: ModulePermissionType[] = await RbacService.getPermissions(user.role);
+            const permissions: ModulePermissionType[] = await rbacService.getPermissions(user.role);
 
             const requiredPermission: ModulePermissionType = `${module}:${action}`;
             if (!permissions.includes(requiredPermission)) {

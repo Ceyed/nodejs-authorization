@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import { RoleController } from './role.controller';
 
-const roleRouter = Router();
+const roleRouter: Router = Router();
+const roleController: RoleController = RoleController.getInstance();
 
-roleRouter.post('/', RoleController.createRole);
+roleRouter.post('/', roleController.createRole.bind(roleController));
 
 export default roleRouter;

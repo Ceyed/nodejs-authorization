@@ -2,12 +2,12 @@ import express, { Request, Response } from 'express';
 import { authRouter } from '../auth/auth.routes';
 import { blogRouter } from '../blog/blog.routes';
 import { productRouter } from '../product/product.routes';
-import { initializeRoles } from '../rbac/default-roles/role.init';
+import { insertDefaultRecords } from '../rbac/default-roles/role.init';
 import roleRouter from '../role/rbac.routes';
 
 export const app = express();
 
-(async () => await initializeRoles())();
+(async () => await insertDefaultRecords())();
 
 app.use(express.json());
 app.use('/auth', authRouter);

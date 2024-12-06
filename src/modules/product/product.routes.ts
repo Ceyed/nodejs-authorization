@@ -5,34 +5,35 @@ import { protect } from '../../common/middleware/auth.middleware';
 import { authorize } from '../../common/middleware/rbac.middleware';
 import { ProductController } from './product.controller';
 
-const productRouter = Router();
+const productRouter: Router = Router();
+const productController: ProductController = ProductController.getInstance();
 
 productRouter.get(
     '/',
     protect,
     authorize(ModulesEnum.PRODUCT, PermissionsEnum.READ),
-    ProductController.read,
+    productController.read.bind(productController),
 );
 
 productRouter.post(
     '/',
     protect,
     authorize(ModulesEnum.PRODUCT, PermissionsEnum.CREATE),
-    ProductController.create,
+    productController.create.bind(productController),
 );
 
 productRouter.put(
     '/',
     protect,
     authorize(ModulesEnum.PRODUCT, PermissionsEnum.UPDATE),
-    ProductController.update,
+    productController.update.bind(productController),
 );
 
 productRouter.delete(
     '/',
     protect,
     authorize(ModulesEnum.PRODUCT, PermissionsEnum.DELETE),
-    ProductController.delete,
+    productController.delete.bind(productController),
 );
 
 export { productRouter };

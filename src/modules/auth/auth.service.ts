@@ -21,18 +21,29 @@ import { RbacService } from '../rbac/rbac.service';
 import { RedisRefreshTokenPrefixConstant } from './../../common/constants/redis/refresh-token-prefix.constant';
 
 export class AuthService {
-    private readonly collectionName = UsersMongoCollectionNameConstant;
+    private readonly _collectionName = UsersMongoCollectionNameConstant;
+    private readonly _rbacService = RbacService.getInstance();
+    private static _instance: AuthService;
+
+    private constructor() {}
+
+    public static getInstance(): AuthService {
+        if (!AuthService._instance) {
+            AuthService._instance = new AuthService();
+        }
+        return AuthService._instance;
+    }
 
     async register(email: string, password: string, role: RolesEnum): Promise<string> {
         const db = await connectToMongo();
-        const users = db.collection<UserInterface>(this.collectionName);
+        const users = db.collection<UserInterface>(this._collectionName);
 
         const existingUser: UserInterface | null = await users.findOne({ email });
         if (existingUser) {
             throw new Error('User already exists');
         }
 
-        const roleExists: boolean = await RbacService.roleExistsByName(role);
+        const roleExists: boolean = await this._rbacService.roleExistsByName(role);
         if (!roleExists) {
             throw new Error('Invalid role');
         }
@@ -50,7 +61,7 @@ export class AuthService {
 
     async login(email: string, password: string): Promise<AccessAndRefreshTokenInterface> {
         const db = await connectToMongo();
-        const users = db.collection<UserInterface>(this.collectionName);
+        const users = db.collection<UserInterface>(this._collectionName);
 
         const user: UserInterface | null = await users.findOne({ email });
         if (!user) {
@@ -86,7 +97,7 @@ export class AuthService {
 
     async findOne(userId: string): Promise<UserInterface | undefined> {
         const db = await connectToMongo();
-        const users = db.collection<UserInterface>(this.collectionName);
+        const users = db.collection<UserInterface>(this._collectionName);
         const user: UserInterface | null = await users.findOne({
             _id: new mongoose.Types.ObjectId(userId),
         });
@@ -98,9 +109,9 @@ export class AuthService {
 
     async assignRole(userId: string, roleId: string): Promise<void> {
         const db = await connectToMongo();
-        const users = db.collection<UserInterface>(this.collectionName);
+        const users = db.collection<UserInterface>(this._collectionName);
 
-        const role: RoleInterface | null = await RbacService.findRole(roleId);
+        const role: RoleInterface | null = await this._rbacService.findRole(roleId);
         if (!role) {
             throw new Error('Invalid role');
         }

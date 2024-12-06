@@ -6,20 +6,33 @@ import { ModulePermissionType } from '../../common/types/module-permission.type'
 import { PermissionGroupService } from './group.service';
 
 export class RbacService {
-    static async roleExistsByName(roleName: string): Promise<boolean> {
+    private static _instance: RbacService;
+    private readonly _permissionGroupService: PermissionGroupService =
+        PermissionGroupService.getInstance();
+
+    private constructor() {}
+
+    public static getInstance(): RbacService {
+        if (!RbacService._instance) {
+            RbacService._instance = new RbacService();
+        }
+        return RbacService._instance;
+    }
+
+    async roleExistsByName(roleName: string): Promise<boolean> {
         const rolesCollection = await getRoleCollection();
         const role: RoleInterface | null = await rolesCollection.findOne({ name: roleName });
         return !!role;
     }
 
-    static async findRole(roleId: string): Promise<RoleInterface | null> {
+    async findRole(roleId: string): Promise<RoleInterface | null> {
         const rolesCollection = await getRoleCollection();
         return rolesCollection.findOne({
             _id: new mongoose.Types.ObjectId(roleId),
         });
     }
 
-    static async getPermissions(roleName: string): Promise<ModulePermissionType[]> {
+    async getPermissions(roleName: string): Promise<ModulePermissionType[]> {
         const rolesCollection = await getRoleCollection();
 
         const role: RoleInterface | null = await rolesCollection.findOne({ name: roleName });
@@ -30,7 +43,7 @@ export class RbacService {
         let allPermissions: string[] = [...role.permissions];
 
         for (const group of role.groups) {
-            const groupPermissions = await PermissionGroupService.getGroup(group);
+            const groupPermissions = await this._permissionGroupService.getGroup(group);
             allPermissions = [...new Set([...allPermissions, ...groupPermissions])];
         }
 
@@ -51,7 +64,7 @@ export class RbacService {
         return [...new Set(allPermissions)] as ModulePermissionType[];
     }
 
-    static async hasPermission(
+    async hasPermission(
         roleName: string,
         module: ModulesEnum,
         action: PermissionsEnum,
@@ -61,7 +74,7 @@ export class RbacService {
         return permissions.includes(requiredPermission);
     }
 
-    static async addGroupToRole(roleId: string, permissionGroupId: string): Promise<void> {
+    async addGroupToRole(roleId: string, permissionGroupId: string): Promise<void> {
         const rolesCollection = await getRoleCollection();
 
         const role: RoleInterface | null = await rolesCollection.findOne({
@@ -71,7 +84,7 @@ export class RbacService {
             throw new Error(`Role with ID "${roleId}" not found`);
         }
 
-        const permission = await PermissionGroupService.getPermissionById(permissionGroupId);
+        const permission = await this._permissionGroupService.getPermissionById(permissionGroupId);
         if (!permission) {
             throw new Error(`Permission with ID "${permissionGroupId}" not found`);
         }
@@ -87,7 +100,7 @@ export class RbacService {
         }
     }
 
-    static async removeGroupFromRole(roleId: string, permissionGroupId: string): Promise<void> {
+    async removeGroupFromRole(roleId: string, permissionGroupId: string): Promise<void> {
         const rolesCollection = await getRoleCollection();
 
         const role: RoleInterface | null = await rolesCollection.findOne({
@@ -97,7 +110,7 @@ export class RbacService {
             throw new Error(`Role with ID "${roleId}" not found`);
         }
 
-        const permission = await PermissionGroupService.getPermissionById(permissionGroupId);
+        const permission = await this._permissionGroupService.getPermissionById(permissionGroupId);
         if (!permission) {
             throw new Error(`PermissionGroup with ID "${permissionGroupId}" not found`);
         }

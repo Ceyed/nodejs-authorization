@@ -7,7 +7,18 @@ import {
 import { ModulePermissionType } from '../../common/types/module-permission.type';
 
 export class PermissionGroupService {
-    static async createGroup(name: string, permissions: ModulePermissionType[]): Promise<void> {
+    private static _instance: PermissionGroupService;
+
+    private constructor() {}
+
+    public static getInstance(): PermissionGroupService {
+        if (!PermissionGroupService._instance) {
+            PermissionGroupService._instance = new PermissionGroupService();
+        }
+        return PermissionGroupService._instance;
+    }
+
+    async createGroup(name: string, permissions: ModulePermissionType[]): Promise<void> {
         const groupCollection = await getPermissionGroupCollection();
         const existingGroup: PermissionGroup | null = await groupCollection.findOne({ name });
         if (existingGroup) {
@@ -21,7 +32,7 @@ export class PermissionGroupService {
         });
     }
 
-    static async getGroup(name: string): Promise<ModulePermissionType[]> {
+    async getGroup(name: string): Promise<ModulePermissionType[]> {
         const groupCollection = await getPermissionGroupCollection();
         const group: PermissionGroup | null = await groupCollection.findOne({ name });
         if (!group) {
@@ -48,17 +59,17 @@ export class PermissionGroupService {
         return [...new Set(expandedPermissions)];
     }
 
-    static async listGroups(): Promise<PermissionGroup[]> {
+    async listGroups(): Promise<PermissionGroup[]> {
         const groupCollection = await getPermissionGroupCollection();
         return groupCollection.find().toArray();
     }
 
-    static async getGroupsByNames(names: string[]) {
+    async getGroupsByNames(names: string[]) {
         const groupCollection = await getPermissionGroupCollection();
         return groupCollection.find({ name: { $in: names } }).toArray();
     }
 
-    static async getPermissionById(permissionGroupId: string): Promise<{ name: string } | null> {
+    async getPermissionById(permissionGroupId: string): Promise<{ name: string } | null> {
         const permissionGroupCollection = await getPermissionGroupCollection();
         const permission: PermissionGroup | null = await permissionGroupCollection.findOne({
             _id: new mongoose.Types.ObjectId(permissionGroupId) as any,
@@ -66,7 +77,7 @@ export class PermissionGroupService {
         return permission ? { name: permission.name } : null;
     }
 
-    static async getGroupsByIds(groupIds: string[]): Promise<PermissionGroup[]> {
+    async getGroupsByIds(groupIds: string[]): Promise<PermissionGroup[]> {
         const permissionGroupCollection = await getPermissionGroupCollection();
 
         return permissionGroupCollection

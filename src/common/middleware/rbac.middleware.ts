@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { UserWithRole } from '../models/rbac.model';
 import { RbacService } from '../../modules/rbac/rbac.service';
 import { ModulesEnum } from '../enums/modules.enum';
 import { PermissionsEnum } from '../enums/permissions.enum';
+import { UserWithRole } from '../models/rbac.model';
 
 interface AuthenticatedRequestInterface extends Request {
     user?: UserWithRole;

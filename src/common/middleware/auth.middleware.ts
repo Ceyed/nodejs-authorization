@@ -23,7 +23,7 @@ export const protect = async (
         // TODO Add type
         const decoded = jwt.verify(token, env.jwtSecret) as any;
 
-        const redisToken = await redis.get(`session:${decoded.userId}`);
+        const redisToken = await redis.get(`session:${decoded.sub}`);
         if (redisToken !== token) {
             res.status(401).json({ message: 'Session expired or invalid' });
             return;

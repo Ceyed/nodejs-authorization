@@ -10,7 +10,7 @@ import { registerSchema } from './auth.validation';
 const authService = new AuthService();
 
 interface AuthenticatedRequestInterface extends Request {
-    user?: { id: string; userId: string };
+    user?: { sub: string };
 }
 
 export const register = async (req: Request, res: Response) => {
@@ -35,7 +35,7 @@ export const login = async (req: Request, res: Response) => {
 
 export const logout = async (req: AuthenticatedRequestInterface, res: Response): Promise<void> => {
     try {
-        const userId = req.user?.userId;
+        const userId = req.user?.sub;
 
         if (!userId) {
             res.status(400).json({ message: 'Invalid request' });
@@ -47,6 +47,8 @@ export const logout = async (req: AuthenticatedRequestInterface, res: Response):
 
         res.status(200).json({ message: 'Logged out successfully' });
     } catch (error: any) {
+        // TODO: Add type
+        // TODO: NO "any" in project
         res.status(500).json({ message: error.message || 'Logout failed' });
     }
 };
@@ -62,13 +64,13 @@ export const refreshAccessToken = async (req: Request, res: Response): Promise<v
 
         const decoded = jwt.verify(refreshToken, env.jwtRefreshSecret) as any;
 
-        const storedToken = await redis.get(`refreshToken:${decoded.userId}`);
+        const storedToken = await redis.get(`refreshToken:${decoded.sub}`);
         if (storedToken !== refreshToken) {
             res.status(401).json({ message: 'Invalid or expired refresh token' });
             return;
         }
 
-        const user = await authService.findOne(decoded.userId);
+        const user = await authService.findOne(decoded.sub);
         if (!user) {
             console.log('here ?');
             res.status(401).json({ message: 'Invalid or expired refresh token' });
@@ -77,7 +79,7 @@ export const refreshAccessToken = async (req: Request, res: Response): Promise<v
 
         // TODO Generate access and refresh tokens in ONE function
         const accessToken = jwt.sign(
-            { userId: user._id, email: user.email, role: user.role },
+            { sub: user._id, email: user.email, role: user.role },
             env.jwtSecret,
             { expiresIn: '15m' },
         );

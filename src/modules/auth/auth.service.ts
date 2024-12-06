@@ -55,13 +55,13 @@ export class AuthService {
         }
 
         const accessToken = jwt.sign(
-            { userId: user._id, email: user.email, role: user.role },
+            { sub: user._id, email: user.email, role: user.role },
             env.jwtSecret,
             // TODO: remove hardcode
             { expiresIn: '15m' },
         );
 
-        const refreshToken = jwt.sign({ userId: user._id }, env.jwtRefreshSecret, {
+        const refreshToken = jwt.sign({ sub: user._id }, env.jwtRefreshSecret, {
             // TODO: Remove hardcode
             expiresIn: '7d',
         });

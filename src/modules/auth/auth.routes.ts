@@ -5,8 +5,6 @@ import { protect } from '../../common/middleware/auth.middleware';
 import { authorize } from '../../common/middleware/rbac.middleware';
 import { AuthController } from './auth.controller';
 
-// TODO Refactor file
-
 const authRouter: Router = Router();
 const authController: AuthController = AuthController.getInstance();
 

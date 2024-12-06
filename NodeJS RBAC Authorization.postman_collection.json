@@ -1,0 +1,559 @@
+{
+	"info": {
+		"_postman_id": "5c767630-cf1b-4ac9-b96c-8bb9457d7690",
+		"name": "NodeJS RBAC Authorization",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "11359121"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"1@test.com\",\n  \"password\": \"password123\",\n  \"role\": \"admin\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@test.com\",\n  \"password\": \"123\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzUxZGJhNTJjMGZmZjk0ZTM1NjYzYWYiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczMzQzMTIyOCwiZXhwIjoxNzMzNDM0ODI4fQ.SjVxaaGPk2_x5FMYX9HgJ4Cy7vsFJtScY_8tiWDjdQg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUzMDlhM2IwODY1ZjMzYmI4OGEzZTIiLCJpYXQiOjE3MzM0OTU1OTQsImV4cCI6MTczNDEwMDM5NH0.hiwy30l5-MxGXjr8PIGpKNqZnsAo76fcYn0PgjlcjtY\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzUxZGJhNTJjMGZmZjk0ZTM1NjYzYWYiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczMzQzMTIyOCwiZXhwIjoxNzMzNDM0ODI4fQ.SjVxaaGPk2_x5FMYX9HgJ4Cy7vsFJtScY_8tiWDjdQg",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/auth/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Role",
+			"item": [
+				{
+					"name": "Create role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUzMDlhM2IwODY1ZjMzYmI4OGEzZTIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzMzNDk1NjA1LCJleHAiOjE3MzM0OTY1MDV9.in05LY0D9kiA5zJBtKjUUAHfZB1A919kWehSyqm5SAk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"TEST\",\n    \"permissions\": [], // e.g. BLOG:CREATE\n    \"permissionGroupIds\": [\"675309a3b0865f33bb88a3e1\", \"675309a3b0865f33bb88a3e0\"]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/role",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"role"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Permission Groups",
+			"item": [
+				{
+					"name": "Create Permission Groups",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUzMDlhM2IwODY1ZjMzYmI4OGEzZTIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzMzNDk1NjA1LCJleHAiOjE3MzM0OTY1MDV9.in05LY0D9kiA5zJBtKjUUAHfZB1A919kWehSyqm5SAk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Mid-Level user\",\n    \"permissions\": [\n        \"BLOG:CREATE\",\n        \"BLOG:UPDATE\",\n        \"PRODUCT:UPDATE\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/permission-groups",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"permission-groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Permission Groups",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUzMDlhM2IwODY1ZjMzYmI4OGEzZTIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzMzNDk1NjA1LCJleHAiOjE3MzM0OTY1MDV9.in05LY0D9kiA5zJBtKjUUAHfZB1A919kWehSyqm5SAk",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/auth/permission-groups",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"permission-groups"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Role Manipulation",
+			"item": [
+				{
+					"name": "Assign Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUzMDlhM2IwODY1ZjMzYmI4OGEzZTIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzMzNDk1NjA1LCJleHAiOjE3MzM0OTY1MDV9.in05LY0D9kiA5zJBtKjUUAHfZB1A919kWehSyqm5SAk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"675309a3b0865f33bb88a3e4\",\n    \"roleId\": \"67530ba84a226ebb30a8afc9\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/assign-role",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"assign-role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Group To Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUzMDlhM2IwODY1ZjMzYmI4OGEzZTIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzMzNDk1NjA1LCJleHAiOjE3MzM0OTY1MDV9.in05LY0D9kiA5zJBtKjUUAHfZB1A919kWehSyqm5SAk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"roleId\": \"67530ba84a226ebb30a8afc9\",\n    \"permissionGroupId\": \"67530be24a226ebb30a8afca\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/add-permission",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"add-permission"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Group From Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUzMDlhM2IwODY1ZjMzYmI4OGEzZTIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzMzNDk1NjA1LCJleHAiOjE3MzM0OTY1MDV9.in05LY0D9kiA5zJBtKjUUAHfZB1A919kWehSyqm5SAk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"roleId\": \"67530ba84a226ebb30a8afc9\",\n    \"permissionGroupId\": \"67530be24a226ebb30a8afca\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/remove-permission",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"remove-permission"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Blog",
+			"item": [
+				{
+					"name": "Read Blog",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUzMDlhM2IwODY1ZjMzYmI4OGEzZTIiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzMzNDk1NjA1LCJleHAiOjE3MzM0OTY1MDV9.in05LY0D9kiA5zJBtKjUUAHfZB1A919kWehSyqm5SAk",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/blog",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"blog"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Blog",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUyMWQ1MzMxYmQ3MDNhY2U4MTdkODUiLCJlbWFpbCI6IjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiTWlkLUxldmVsIEVkaXRvciIsImlhdCI6MTczMzQ5MTM3MywiZXhwIjoxNzMzNDkyMjczfQ.BeVun3ax-G1A_ulUolmr7TacMZvAg2wGpiuhkMFAy2g",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/blog",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"blog"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Blog",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUyMWQ1MzMxYmQ3MDNhY2U4MTdkODUiLCJlbWFpbCI6IjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiTWlkLUxldmVsIEVkaXRvciIsImlhdCI6MTczMzQ5MTM3MywiZXhwIjoxNzMzNDkyMjczfQ.BeVun3ax-G1A_ulUolmr7TacMZvAg2wGpiuhkMFAy2g",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/blog",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"blog"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Blog",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUyMWQ1MzMxYmQ3MDNhY2U4MTdkODUiLCJlbWFpbCI6IjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiTWlkLUxldmVsIEVkaXRvciIsImlhdCI6MTczMzQ5MTM3MywiZXhwIjoxNzMzNDkyMjczfQ.BeVun3ax-G1A_ulUolmr7TacMZvAg2wGpiuhkMFAy2g",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/blog",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"blog"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "Read Product",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUyMWQ1MzMxYmQ3MDNhY2U4MTdkODUiLCJlbWFpbCI6IjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiTWlkLUxldmVsIEVkaXRvciIsImlhdCI6MTczMzQ5MTM3MywiZXhwIjoxNzMzNDkyMjczfQ.BeVun3ax-G1A_ulUolmr7TacMZvAg2wGpiuhkMFAy2g",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUyMWQ1MzMxYmQ3MDNhY2U4MTdkODUiLCJlbWFpbCI6IjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiTWlkLUxldmVsIEVkaXRvciIsImlhdCI6MTczMzQ5MTM3MywiZXhwIjoxNzMzNDkyMjczfQ.BeVun3ax-G1A_ulUolmr7TacMZvAg2wGpiuhkMFAy2g",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUyMWQ1MzMxYmQ3MDNhY2U4MTdkODUiLCJlbWFpbCI6IjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiTWlkLUxldmVsIEVkaXRvciIsImlhdCI6MTczMzQ5MTM3MywiZXhwIjoxNzMzNDkyMjczfQ.BeVun3ax-G1A_ulUolmr7TacMZvAg2wGpiuhkMFAy2g",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Product",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzUyMWQ1MzMxYmQ3MDNhY2U4MTdkODUiLCJlbWFpbCI6IjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiTWlkLUxldmVsIEVkaXRvciIsImlhdCI6MTczMzQ5MTM3MywiZXhwIjoxNzMzNDkyMjczfQ.BeVun3ax-G1A_ulUolmr7TacMZvAg2wGpiuhkMFAy2g",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"product"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

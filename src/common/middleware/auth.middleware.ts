@@ -1,11 +1,9 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../../modules/app/config/env';
 import { redis } from '../../modules/app/config/redis';
-
-interface AuthenticatedRequestInterface extends Request {
-    user?: { id: string };
-}
+import { AuthenticatedRequestInterface } from '../interfaces/authenticated-request.interface';
+import { JwtAccessTokenInterface } from '../interfaces/jwt-access-token.interface';
 
 export const protect = async (
     req: AuthenticatedRequestInterface,
@@ -20,8 +18,10 @@ export const protect = async (
     }
 
     try {
-        // TODO Add type
-        const decoded = jwt.verify(token, env.jwtSecret) as any;
+        const decoded: JwtAccessTokenInterface = jwt.verify(
+            token,
+            env.jwtSecret,
+        ) as JwtAccessTokenInterface;
 
         const redisToken = await redis.get(`session:${decoded.sub}`);
         if (redisToken !== token) {

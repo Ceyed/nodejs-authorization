@@ -1,6 +1,5 @@
 export enum ModulesEnum {
+    ROLE = 'ROLE',
     BLOG = 'BLOG',
     PRODUCT = 'PRODUCT',
-    ROLE = 'ROLE',
-    USER_GROUP = 'USER_GROUP',
 }

@@ -1,7 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
-import { User } from '../../common/models/auth.model';
+import { RolesEnum } from '../../common/enums/roles.enum';
+import { UserInterface } from '../../common/interfaces/auth.interface';
 import { connectToMongo } from '../app/config/db';
 import { env } from '../app/config/env';
 import { redis } from '../app/config/redis';
@@ -11,9 +12,9 @@ export class AuthService {
     // TODO: No hardcode
     private readonly collectionName = 'users';
 
-    async register(email: string, password: string, role: string): Promise<string> {
+    async register(email: string, password: string, role: RolesEnum): Promise<string> {
         const db = await connectToMongo();
-        const users = db.collection<User>(this.collectionName);
+        const users = db.collection<UserInterface>(this.collectionName);
 
         const existingUser = await users.findOne({ email });
         if (existingUser) {
@@ -26,14 +27,14 @@ export class AuthService {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user: User = {
+        const user: UserInterface = {
             createdAt: new Date(),
             email,
             password: hashedPassword,
             role,
         };
 
-        const result = await users.insertOne(user as User);
+        const result = await users.insertOne(user as UserInterface);
         return result.insertedId.toString();
     }
 
@@ -42,7 +43,7 @@ export class AuthService {
         password: string,
     ): Promise<{ accessToken: string; refreshToken: string }> {
         const db = await connectToMongo();
-        const users = db.collection<User>(this.collectionName);
+        const users = db.collection<UserInterface>(this.collectionName);
 
         const user = await users.findOne({ email });
         if (!user) {
@@ -74,17 +75,17 @@ export class AuthService {
 
     async findOne(userId: string) {
         const db = await connectToMongo();
-        const users = db.collection<User>(this.collectionName);
-        const user = await users.findOne({ id: new mongoose.Types.ObjectId(userId) });
+        const users = db.collection<UserInterface>(this.collectionName);
+        const user = await users.findOne({ _id: new mongoose.Types.ObjectId(userId) });
         if (!user) {
             return undefined;
         }
         return user;
     }
 
-    async assignRole(userId: string, role: string): Promise<void> {
+    async assignRole(userId: string, role: RolesEnum): Promise<void> {
         const db = await connectToMongo();
-        const users = db.collection<User>(this.collectionName);
+        const users = db.collection<UserInterface>(this.collectionName);
 
         if (!(await RbacService.roleExists(role))) {
             throw new Error('Invalid role');

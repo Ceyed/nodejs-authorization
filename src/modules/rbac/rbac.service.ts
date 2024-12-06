@@ -1,6 +1,6 @@
 import { ModulesEnum } from '../../common/enums/modules.enum';
 import { PermissionsEnum } from '../../common/enums/permissions.enum';
-import { getRoleCollection } from '../../common/models/role.model';
+import { getRoleCollection } from '../../common/interfaces/role.interface';
 import { PermissionGroupService } from './group.service';
 
 export class RbacService {
@@ -28,8 +28,10 @@ export class RbacService {
         allPermissions = allPermissions.reduce((acc, permission) => {
             const [module, action] = permission.split(':');
             if (action === PermissionsEnum.ALL) {
-                // TODO: No hardcode
-                const modulePermissions = [`${module}:read`, `${module}:write`, `${module}:delete`];
+                const allPermissionExceptAll = Object.values(PermissionsEnum).filter(
+                    (p) => p !== PermissionsEnum.ALL,
+                );
+                const modulePermissions = allPermissionExceptAll.map((p) => `${module}:${p}`);
                 return [...acc, ...modulePermissions];
             }
             return [...acc, permission];

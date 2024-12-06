@@ -1,3 +1,4 @@
+import { PermissionsEnum } from '../../common/enums/permissions.enum';
 import { getPermissionGroupCollection, PermissionGroup } from './group.model';
 
 export class PermissionGroupService {
@@ -33,8 +34,10 @@ export class PermissionGroupService {
         const expandedPermissions = group.permissions.reduce((acc, permission) => {
             const [module, action] = permission.split(':');
             if (action === 'all') {
-                // TODO: No hardcode
-                const modulePermissions = [`${module}:read`, `${module}:write`, `${module}:delete`];
+                const allPermissionExceptAll = Object.values(PermissionsEnum).filter(
+                    (p) => p !== PermissionsEnum.ALL,
+                );
+                const modulePermissions = allPermissionExceptAll.map((p) => `${module}:${p}`);
                 return [...acc, ...modulePermissions];
             }
             return [...acc, permission];

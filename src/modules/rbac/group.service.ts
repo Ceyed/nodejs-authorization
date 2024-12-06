@@ -51,4 +51,9 @@ export class PermissionGroupService {
         const groupCollection = await getPermissionGroupCollection();
         return groupCollection.find().toArray();
     }
+
+    static async getGroupsByNames(names: string[]) {
+        const groupCollection = await getPermissionGroupCollection();
+        return groupCollection.find({ name: { $in: names } }).toArray();
+    }
 }

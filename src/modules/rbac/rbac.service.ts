@@ -53,7 +53,7 @@ export class RbacService {
         return permissions.includes(requiredPermission);
     }
 
-    static async addPermission(roleName: string, permission: PermissionsEnum): Promise<void> {
+    static async addPermission(roleName: string, permission: ModulePermissionType): Promise<void> {
         const rolesCollection = await getRoleCollection();
 
         const role: RoleInterface | null = await rolesCollection.findOne({ name: roleName });
@@ -69,7 +69,10 @@ export class RbacService {
         }
     }
 
-    static async removePermission(roleName: string, permission: PermissionsEnum): Promise<void> {
+    static async removePermission(
+        roleName: string,
+        permission: ModulePermissionType,
+    ): Promise<void> {
         const rolesCollection = await getRoleCollection();
 
         await rolesCollection.updateOne(

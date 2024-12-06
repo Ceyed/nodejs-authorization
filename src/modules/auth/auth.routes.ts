@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { ModulesEnum } from '../../common/enums/modules.enum';
 import { PermissionsEnum } from '../../common/enums/permissions.enum';
-import { AuthenticatedRequestInterface } from '../../common/interfaces/authenticated-request.interface';
 import { protect } from '../../common/middleware/auth.middleware';
 import { authorize } from '../../common/middleware/rbac.middleware';
 import {
@@ -23,11 +22,8 @@ const authRouter = Router();
 // ? Authentication
 authRouter.post('/register', register);
 authRouter.post('/login', login);
-authRouter.get('/protected', protect, (req: AuthenticatedRequestInterface, res) => {
-    res.status(200).json({ message: 'This is a protected route', user: req.user });
-});
-authRouter.post('/logout', protect, logout);
 authRouter.post('/refresh', refreshAccessToken);
+authRouter.post('/logout', protect, logout);
 
 // ? Authorization
 authRouter.post(
@@ -61,32 +57,6 @@ authRouter.get(
     protect,
     authorize(ModulesEnum.ROLE, PermissionsEnum.READ),
     listPermissionGroups,
-);
-
-// ? TEST ROUTES
-authRouter.get(
-    '/read-protected',
-    protect,
-    authorize(ModulesEnum.BLOG, PermissionsEnum.READ),
-    (req: AuthenticatedRequestInterface, res) => {
-        res.status(200).json({ message: 'You have read access', user: req.user });
-    },
-);
-authRouter.post(
-    '/write-protected',
-    protect,
-    authorize(ModulesEnum.BLOG, PermissionsEnum.CREATE),
-    (req: AuthenticatedRequestInterface, res) => {
-        res.status(200).json({ message: 'You have write access', user: req.user });
-    },
-);
-authRouter.delete(
-    '/delete-protected',
-    protect,
-    authorize(ModulesEnum.BLOG, PermissionsEnum.DELETE),
-    (req: AuthenticatedRequestInterface, res) => {
-        res.status(200).json({ message: 'You have delete access', user: req.user });
-    },
 );
 
 export { authRouter };

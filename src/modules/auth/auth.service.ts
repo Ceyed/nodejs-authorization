@@ -4,6 +4,10 @@ import { InsertOneResult } from 'mongodb';
 import mongoose, { UpdateResult } from 'mongoose';
 import { UsersMongoCollectionNameConstant } from '../../common/constants/mongo/users-collection.constant';
 import { RedisSessionPrefixConstant } from '../../common/constants/redis/session-prefix.constant';
+import {
+    RedisAccessTokenTtl,
+    RedisRefreshTokenTtl,
+} from '../../common/constants/redis/tokens-ttl.constants';
 import { RolesEnum } from '../../common/enums/roles.enum';
 import { AccessAndRefreshTokenInterface } from '../../common/interfaces/access-and-refresh-tokens.interface';
 import { JwtAccessTokenInterface } from '../../common/interfaces/jwt-access-token.interface';
@@ -63,13 +67,17 @@ export class AuthService {
             role: user.role,
         });
 
-        // TODO
-        await redis.set(`${RedisSessionPrefixConstant}:${user._id}`, accessToken, 'EX', 3600);
+        await redis.set(
+            `${RedisSessionPrefixConstant}:${user._id}`,
+            accessToken,
+            'EX',
+            RedisAccessTokenTtl,
+        );
         await redis.set(
             `${RedisRefreshTokenPrefixConstant}:${user._id}`,
             refreshToken,
             'EX',
-            7 * 24 * 60 * 60,
+            RedisRefreshTokenTtl,
         );
 
         return { accessToken, refreshToken };

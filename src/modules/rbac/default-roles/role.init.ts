@@ -1,7 +1,7 @@
-import { ModulesEnum } from '../../common/enums/modules.enum';
-import { PermissionsEnum } from '../../common/enums/permissions.enum';
-import { getRoleCollection } from '../../common/interfaces/role.interface';
-import { PermissionGroupService } from './group.service';
+import { ModulesEnum } from '../../../common/enums/modules.enum';
+import { PermissionsEnum } from '../../../common/enums/permissions.enum';
+import { getRoleCollection } from '../../../common/interfaces/role.interface';
+import { PermissionGroupService } from '../group.service';
 
 export const initializeRoles = async () => {
     const rolesCollection = await getRoleCollection();

@@ -1,6 +1,9 @@
 import { PermissionsEnum } from '../../common/enums/permissions.enum';
+import {
+    getPermissionGroupCollection,
+    PermissionGroup,
+} from '../../common/interfaces/permission-group.interface';
 import { ModulePermissionType } from '../../common/types/module-permission.type';
-import { getPermissionGroupCollection, PermissionGroup } from './group.model';
 
 export class PermissionGroupService {
     static async createGroup(name: string, permissions: ModulePermissionType[]): Promise<void> {

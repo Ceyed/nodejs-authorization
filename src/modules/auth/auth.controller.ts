@@ -2,15 +2,21 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { RedisRefreshTokenPrefixConstant } from '../../common/constants/redis/refresh-token-prefix.constant';
 import { RedisSessionPrefixConstant } from '../../common/constants/redis/session-prefix.constant';
+import {
+    RedisAccessTokenTtl,
+    RedisRefreshTokenTtl,
+} from '../../common/constants/redis/tokens-ttl.constants';
 import { AuthenticatedRequestInterface } from '../../common/interfaces/authenticated-request.interface';
 import { JwtRefreshTokenInterface } from '../../common/interfaces/jwt-refresh-token.interface';
 import { UserInterface } from '../../common/interfaces/user.interface';
+import { ModulePermissionType } from '../../common/types/module-permission.type';
 import { env } from '../app/config/env';
 import { redis } from '../app/config/redis';
 import { PermissionGroupService } from '../rbac/group.service';
 import { RbacService } from '../rbac/rbac.service';
 import { AuthService } from './auth.service';
-import { registerSchema } from './auth.validation';
+import { registerSchema } from './validation/auth.validation';
+import { createPermissionGroupSchema } from './validation/permission-group.validation';
 
 const authService = new AuthService();
 
@@ -92,13 +98,17 @@ export async function refreshAccessToken(req: Request, res: Response): Promise<v
             role: user.role,
         });
 
-        // TODO: no hardcode
-        await redis.set(`${RedisSessionPrefixConstant}:${user._id}`, accessToken, 'EX', 3600);
+        await redis.set(
+            `${RedisSessionPrefixConstant}:${user._id}`,
+            accessToken,
+            'EX',
+            RedisAccessTokenTtl,
+        );
         await redis.set(
             `${RedisRefreshTokenPrefixConstant}:${user._id}`,
             refreshToken,
             'EX',
-            7 * 24 * 60 * 60,
+            RedisRefreshTokenTtl,
         );
 
         res.status(200).json({ accessToken });
@@ -166,13 +176,16 @@ export async function removePermission(req: Request, res: Response): Promise<voi
 
 export async function createPermissionGroup(req: Request, res: Response): Promise<void> {
     try {
-        const { name, permissions } = req.body;
-        if (!name || !permissions || !Array.isArray(permissions)) {
-            res.status(400).json({ message: 'Invalid group data' });
+        const parsedBody = createPermissionGroupSchema.safeParse(req.body);
+
+        if (!parsedBody.success) {
+            res.status(400).json({ message: parsedBody.error.errors[0].message });
             return;
         }
 
-        await PermissionGroupService.createGroup(name, permissions);
+        const { name, permissions } = parsedBody.data;
+
+        await PermissionGroupService.createGroup(name, permissions as ModulePermissionType[]);
         res.status(201).json({ message: 'Permission group created successfully' });
     } catch (error) {
         let errorMessage: string = 'Failed to create permission group';

@@ -1,6 +1,6 @@
-import { PermissionGroupMongoCollectionNameConstant } from '../../common/constants/mongo/permission-group-collection.constant';
-import { ModulePermissionType } from '../../common/types/module-permission.type';
-import { connectToMongo } from '../app/config/db';
+import { connectToMongo } from '../../modules/app/config/db';
+import { PermissionGroupMongoCollectionNameConstant } from '../constants/mongo/permission-group-collection.constant';
+import { ModulePermissionType } from '../types/module-permission.type';
 
 export interface PermissionGroup {
     _id?: string;

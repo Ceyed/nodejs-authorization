@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { RolesEnum } from '../../common/enums/roles.enum';
+import { RolesEnum } from '../../../common/enums/roles.enum';
 
 export const registerSchema = z.object({
     email: z.string().email('Invalid email address'),

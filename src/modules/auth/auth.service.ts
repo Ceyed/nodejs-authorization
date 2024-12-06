@@ -1,82 +1,86 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
+import { InsertOneResult } from 'mongodb';
+import mongoose, { UpdateResult } from 'mongoose';
+import { UsersMongoCollectionNameConstant } from '../../common/constants/mongo/users-collection.constant';
+import { RedisSessionPrefixConstant } from '../../common/constants/redis/session-prefix.constant';
 import { RolesEnum } from '../../common/enums/roles.enum';
-import { UserInterface } from '../../common/interfaces/auth.interface';
+import { AccessAndRefreshTokenInterface } from '../../common/interfaces/access-and-refresh-tokens.interface';
+import { JwtAccessTokenInterface } from '../../common/interfaces/jwt-access-token.interface';
+import { JwtRefreshTokenInterface } from '../../common/interfaces/jwt-refresh-token.interface';
+import { UserInterface } from '../../common/interfaces/user.interface';
 import { connectToMongo } from '../app/config/db';
 import { env } from '../app/config/env';
 import { redis } from '../app/config/redis';
 import { RbacService } from '../rbac/rbac.service';
+import { RedisRefreshTokenPrefixConstant } from './../../common/constants/redis/refresh-token-prefix.constant';
 
 export class AuthService {
-    // TODO: No hardcode
-    private readonly collectionName = 'users';
+    private readonly collectionName = UsersMongoCollectionNameConstant;
 
     async register(email: string, password: string, role: RolesEnum): Promise<string> {
         const db = await connectToMongo();
         const users = db.collection<UserInterface>(this.collectionName);
 
-        const existingUser = await users.findOne({ email });
+        const existingUser: UserInterface | null = await users.findOne({ email });
         if (existingUser) {
             throw new Error('User already exists');
         }
 
-        if (!(await RbacService.roleExists(role))) {
+        const roleExists: boolean = await RbacService.roleExists(role);
+        if (!roleExists) {
             throw new Error('Invalid role');
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const user: UserInterface = {
+        const hashedPassword: string = await bcrypt.hash(password, 10);
+        const user: Partial<UserInterface> = {
             createdAt: new Date(),
             email,
             password: hashedPassword,
             role,
         };
-
-        const result = await users.insertOne(user as UserInterface);
+        const result: InsertOneResult<UserInterface> = await users.insertOne(user as UserInterface);
         return result.insertedId.toString();
     }
 
-    async login(
-        email: string,
-        password: string,
-    ): Promise<{ accessToken: string; refreshToken: string }> {
+    async login(email: string, password: string): Promise<AccessAndRefreshTokenInterface> {
         const db = await connectToMongo();
         const users = db.collection<UserInterface>(this.collectionName);
 
-        const user = await users.findOne({ email });
+        const user: UserInterface | null = await users.findOne({ email });
         if (!user) {
             throw new Error('Invalid credentials');
         }
 
-        const passwordMatch = await bcrypt.compare(password, user.password);
+        const passwordMatch: boolean = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
             throw new Error('Invalid credentials');
         }
 
-        const accessToken = jwt.sign(
-            { sub: user._id, email: user.email, role: user.role },
-            env.jwtSecret,
-            // TODO: remove hardcode
-            { expiresIn: '15m' },
-        );
-
-        const refreshToken = jwt.sign({ sub: user._id }, env.jwtRefreshSecret, {
-            // TODO: Remove hardcode
-            expiresIn: '7d',
+        const { accessToken, refreshToken } = this.generateTokens({
+            sub: '' + user._id,
+            email: user.email,
+            role: user.role,
         });
 
-        await redis.set(`session:${user._id}`, accessToken, 'EX', 3600); // Expire in 1 hour
-        await redis.set(`refreshToken:${user._id}`, refreshToken, 'EX', 7 * 24 * 60 * 60); // 7 days expiration
+        // TODO
+        await redis.set(`${RedisSessionPrefixConstant}:${user._id}`, accessToken, 'EX', 3600);
+        await redis.set(
+            `${RedisRefreshTokenPrefixConstant}:${user._id}`,
+            refreshToken,
+            'EX',
+            7 * 24 * 60 * 60,
+        );
 
         return { accessToken, refreshToken };
     }
 
-    async findOne(userId: string) {
+    async findOne(userId: string): Promise<UserInterface | undefined> {
         const db = await connectToMongo();
         const users = db.collection<UserInterface>(this.collectionName);
-        const user = await users.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+        const user: UserInterface | null = await users.findOne({
+            _id: new mongoose.Types.ObjectId(userId),
+        });
         if (!user) {
             return undefined;
         }
@@ -87,11 +91,12 @@ export class AuthService {
         const db = await connectToMongo();
         const users = db.collection<UserInterface>(this.collectionName);
 
-        if (!(await RbacService.roleExists(role))) {
+        const roleExists: boolean = await RbacService.roleExists(role);
+        if (!roleExists) {
             throw new Error('Invalid role');
         }
 
-        const result = await users.updateOne(
+        const result: UpdateResult = await users.updateOne(
             { _id: new mongoose.Types.ObjectId(userId) },
             { $set: { role } },
         );
@@ -99,5 +104,22 @@ export class AuthService {
         if (result.matchedCount === 0) {
             throw new Error('User not found');
         }
+    }
+
+    generateTokens(user: Partial<JwtAccessTokenInterface>): AccessAndRefreshTokenInterface {
+        const accessTokenPayload: Partial<JwtAccessTokenInterface> = {
+            sub: user.sub,
+            email: user.email,
+            role: user.role,
+        };
+        const accessToken: string = jwt.sign(accessTokenPayload, env.jwtSecret, {
+            expiresIn: '15m',
+        });
+
+        const refreshTokenPayload: Partial<JwtRefreshTokenInterface> = { sub: user.sub };
+        const refreshToken: string = jwt.sign(refreshTokenPayload, env.jwtRefreshSecret, {
+            expiresIn: '7d',
+        });
+        return { accessToken, refreshToken };
     }
 }

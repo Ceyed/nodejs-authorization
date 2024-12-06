@@ -16,6 +16,8 @@ import {
     removePermission,
 } from './auth.controller';
 
+// TODO Refactor file
+
 const authRouter = Router();
 
 // ? Authentication

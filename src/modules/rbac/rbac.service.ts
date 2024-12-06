@@ -1,24 +1,25 @@
 import { ModulesEnum } from '../../common/enums/modules.enum';
 import { PermissionsEnum } from '../../common/enums/permissions.enum';
-import { getRoleCollection } from '../../common/interfaces/role.interface';
+import { getRoleCollection, RoleInterface } from '../../common/interfaces/role.interface';
+import { ModulePermissionType } from '../../common/types/module-permission.type';
 import { PermissionGroupService } from './group.service';
 
 export class RbacService {
     static async roleExists(roleName: string): Promise<boolean> {
         const rolesCollection = await getRoleCollection();
-        const role = await rolesCollection.findOne({ name: roleName });
+        const role: RoleInterface | null = await rolesCollection.findOne({ name: roleName });
         return !!role;
     }
 
-    static async getPermissions(roleName: string): Promise<string[]> {
+    static async getPermissions(roleName: string): Promise<ModulePermissionType[]> {
         const rolesCollection = await getRoleCollection();
 
-        const role = await rolesCollection.findOne({ name: roleName });
+        const role: RoleInterface | null = await rolesCollection.findOne({ name: roleName });
         if (!role) {
             throw new Error(`Role "${roleName}" not found`);
         }
 
-        let allPermissions = [...role.permissions];
+        let allPermissions: string[] = [...role.permissions];
 
         for (const group of role.groups) {
             const groupPermissions = await PermissionGroupService.getGroup(group);
@@ -31,13 +32,15 @@ export class RbacService {
                 const allPermissionExceptAll = Object.values(PermissionsEnum).filter(
                     (p) => p !== PermissionsEnum.ALL,
                 );
-                const modulePermissions = allPermissionExceptAll.map((p) => `${module}:${p}`);
+                const modulePermissions: ModulePermissionType[] = allPermissionExceptAll.map(
+                    (p) => `${module}:${p}` as ModulePermissionType,
+                );
                 return [...acc, ...modulePermissions];
             }
             return [...acc, permission];
         }, [] as string[]);
 
-        return [...new Set(allPermissions)];
+        return [...new Set(allPermissions)] as ModulePermissionType[];
     }
 
     static async hasPermission(
@@ -45,15 +48,15 @@ export class RbacService {
         module: ModulesEnum,
         action: PermissionsEnum,
     ): Promise<boolean> {
-        const requiredPermission = `${module}:${action}`;
-        const permissions = await this.getPermissions(roleName);
+        const requiredPermission: ModulePermissionType = `${module}:${action}`;
+        const permissions: ModulePermissionType[] = await this.getPermissions(roleName);
         return permissions.includes(requiredPermission);
     }
 
-    static async addPermission(roleName: string, permission: string): Promise<void> {
+    static async addPermission(roleName: string, permission: PermissionsEnum): Promise<void> {
         const rolesCollection = await getRoleCollection();
 
-        const role = await rolesCollection.findOne({ name: roleName });
+        const role: RoleInterface | null = await rolesCollection.findOne({ name: roleName });
         if (!role) {
             throw new Error(`Role "${roleName}" not found`);
         }
@@ -66,7 +69,7 @@ export class RbacService {
         }
     }
 
-    static async removePermission(roleName: string, permission: string): Promise<void> {
+    static async removePermission(roleName: string, permission: PermissionsEnum): Promise<void> {
         const rolesCollection = await getRoleCollection();
 
         await rolesCollection.updateOne(

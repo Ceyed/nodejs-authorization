@@ -3,6 +3,8 @@ import { RbacService } from '../../modules/rbac/rbac.service';
 import { ModulesEnum } from '../enums/modules.enum';
 import { PermissionsEnum } from '../enums/permissions.enum';
 import { AuthenticatedRequestInterface } from '../interfaces/authenticated-request.interface';
+import { UserWithRoleInterface } from '../interfaces/role.interface';
+import { ModulePermissionType } from '../types/module-permission.type';
 
 export const authorize = (module: ModulesEnum, action: PermissionsEnum) => {
     return async (
@@ -11,17 +13,16 @@ export const authorize = (module: ModulesEnum, action: PermissionsEnum) => {
         next: NextFunction,
     ): Promise<void> => {
         try {
-            const user = req.user;
+            const user: UserWithRoleInterface | undefined = req.user;
             if (!user || !user.role) {
                 res.status(401).json({ message: 'Unauthorized' });
                 return;
             }
 
-            const permissions = await RbacService.getPermissions(user.role);
+            const permissions: ModulePermissionType[] = await RbacService.getPermissions(user.role);
 
-            const requiredPermission = `${module}:${action}`;
+            const requiredPermission: ModulePermissionType = `${module}:${action}`;
             if (!permissions.includes(requiredPermission)) {
-                console.log({ permissions, requiredPermission });
                 res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
                 return;
             }

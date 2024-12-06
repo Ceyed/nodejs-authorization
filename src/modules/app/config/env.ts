@@ -2,13 +2,29 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// TODO: Handle empty .env file
+export enum AppEnvEnum {
+    PORT = 'PORT',
+    MONGO_URI = 'MONGO_URI',
+    REDIS_HOST = 'REDIS_HOST',
+    REDIS_PORT = 'REDIS_PORT',
+    JWT_SECRET = 'JWT_SECRET',
+    JWT_REFRESH_SECRET = 'JWT_REFRESH_SECRET',
+}
+
+function getEnvVariable(key: AppEnvEnum): string {
+    const value: string | undefined = process.env[key];
+    if (!value) {
+        console.error(`Missing required environment variable: ${key}`);
+        process.exit(1);
+    }
+    return value;
+}
 
 export const env = {
-    port: process.env.PORT || 3000,
-    mongoUri: process.env.MONGO_URI || '',
-    redisHost: process.env.REDIS_HOST || '127.0.0.1',
-    redisPort: Number(process.env.REDIS_PORT) || 6379,
-    jwtSecret: process.env.JWT_SECRET || 'secret',
-    jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || 'secret',
+    port: +getEnvVariable(AppEnvEnum.PORT),
+    mongoUri: getEnvVariable(AppEnvEnum.MONGO_URI),
+    redisHost: getEnvVariable(AppEnvEnum.REDIS_HOST),
+    redisPort: +getEnvVariable(AppEnvEnum.REDIS_PORT),
+    jwtSecret: getEnvVariable(AppEnvEnum.JWT_SECRET),
+    jwtRefreshSecret: getEnvVariable(AppEnvEnum.JWT_REFRESH_SECRET),
 };
